@@ -6,9 +6,7 @@ using MQTTnet.Client;
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 app.MapPost("/", async (TiltInput input) =>
-{
-    Console.Write(input);
-
+{   
     var mqttServerAddress = Environment.GetEnvironmentVariable("MqttServerAddress");
     var mqttServerPort = Environment.GetEnvironmentVariable("MqttServerPort");
     var mqttServerUsername = Environment.GetEnvironmentVariable("MqttServerUser");
@@ -22,8 +20,8 @@ app.MapPost("/", async (TiltInput input) =>
     var factory = new MqttFactory();
     var mqttClient = factory.CreateMqttClient();
     var res = await mqttClient.ConnectAsync(options, CancellationToken.None);
-    await mqttClient.PublishAsync(Message("temperature", input.Temp), CancellationToken.None);
-    await mqttClient.PublishAsync(Message("gravity", input.Sg), CancellationToken.None);
+    await mqttClient.PublishAsync(Message("temperature", input.Temp.ToString()), CancellationToken.None);
+    await mqttClient.PublishAsync(Message("gravity", input.Sg.ToString()), CancellationToken.None);
     mqttClient.Dispose();
     return Results.Ok();
 });
