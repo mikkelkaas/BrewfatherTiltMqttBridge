@@ -22,15 +22,20 @@ app.MapPost("/", async (TiltInput input) =>
     var factory = new MqttFactory();
     var mqttClient = factory.CreateMqttClient();
     var res = await mqttClient.ConnectAsync(options, CancellationToken.None);
-    var message = new MqttApplicationMessageBuilder()
-        .WithTopic("BrewTilt")
-        .WithPayload(JsonSerializer.Serialize(input))
-        .WithRetainFlag()
-        .Build();
-    await mqttClient.PublishAsync(message, CancellationToken.None);
+    await mqttClient.PublishAsync(Message("temperature", input.Temp), CancellationToken.None);
+    await mqttClient.PublishAsync(Message("gravity", input.Sg), CancellationToken.None);
     mqttClient.Dispose();
     return Results.Ok();
 });
+
+MqttApplicationMessage Message(string topic, string payload)
+{
+    return new MqttApplicationMessageBuilder()
+        .WithTopic("BrewTilt/"+topic)
+        .WithPayload(payload)
+        .WithRetainFlag()
+        .Build();
+}
 
 app.Run();
 
